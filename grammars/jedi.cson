@@ -1,0 +1,882 @@
+name: 'Jedi'
+scopeName: 'source.jedi'
+fileTypes: [
+  'jedi'
+]
+patterns: [
+  {
+    include: '#main'
+  }
+]
+repository:
+  'main':
+    patterns: [
+      {
+        include: '#comments'
+      },
+      {
+        include: '#keywords'
+      },
+      {
+        include: '#layouts'
+      }
+    ]
+  'comments':
+    patterns: [
+      {
+        include: '#comments-unbuffered'
+      },
+      {
+        include: '#comments-buffered'
+      }
+    ]
+  'keywords':
+    patterns: [
+      {
+        include: '#inline-keyword-statement'
+      },
+      {
+        include: '#block-keyword-statement'
+      },
+      {
+        include: '#block-expression'
+      },
+      {
+        include: '#macro'
+      },
+      {
+        include: '#php-embedded'
+      }
+    ]
+  'inline-keyword-statement':
+    patterns: [
+      {
+        include: '#external-statement'
+      },
+      {
+        include: '#import-statement'
+      },
+      {
+        include: '#namespace-statement'
+      },
+      {
+        include: '#unsafe-statement'
+      },
+      {
+        include: '#debug-statement'
+      }
+    ]
+  'block-keyword-statement':
+    patterns: [
+      {
+        include: '#if-statement'
+      },
+      {
+        include: '#else-statement'
+      },
+      {
+        include: '#let-statement'
+      },
+      {
+        include: '#for-statement'
+      }
+    ]
+  'layouts':
+    patterns: [
+      {
+        include: '#block-extended'
+      },
+      {
+        include: '#html-tag'
+      }
+    ]
+  'html-tag':
+    patterns: [
+      {
+        include: '#script-tag'
+      },
+      {
+        include: '#style-tag'
+      },
+      {
+        include: '#common-tag'
+      },
+      {
+        include: '#text-node'
+      }
+    ]
+  'html-tag-info':
+    patterns: [
+      {
+        include: '#inline-statement'
+      },
+      {
+        include: '#tag-selector'
+      },
+      {
+        include: '#tag-attributes'
+      },
+      {
+        include: '#tag-hierarchy'
+      },
+      {
+        include: '#inline-expression'
+      },
+      {
+        include: '#macro-invoking'
+      }
+    ]
+  'expression':
+    patterns: [
+      {
+        include: '#literal'
+      },
+      {
+        include: '#array'
+      },
+      {
+        include: '#macro-data'
+      },
+      {
+        include: '#property-expression'
+      },
+      {
+        include: '#function-call'
+      },
+      {
+        include: '#arithmetic-expression'
+      },
+      {
+        include: '#logic-expression'
+      },
+      {
+        include: '#ternary-expression'
+      },
+      {
+        include: '#base-variable'
+      }
+    ]
+
+  'comments-unbuffered':
+    patterns: [
+      {
+        begin: '^(\\s*)--'
+        end: '^(?!\\1\\s|\\s*$)'
+        name: 'comment.block.unbuffered.jedi'
+      },
+      {
+        begin: '//'
+        end: '\\n'
+        name: 'comment.line.unbuffered.jedi'
+      }
+    ]
+  'comments-buffered':
+    patterns: [
+      {
+        begin: '^(\\s*)!'
+        end: '^(?!\\1\\s|\\s*$)'
+        name: 'string.comment.block.buffered.jedi'
+      },
+      {
+        begin: '^\\s*!'
+        end: '\\n'
+        name: 'comment.line.buffered.jedi'
+      }
+    ]
+
+  'script-tag':
+    begin: '^(\\s*)(script)'
+    beginCaptures:
+      '2':
+        name: 'entity.name.tag.script.jedi'
+    end: '^(?!(\\1\\s)|\\s*$)'
+    patterns: [
+      {
+        begin: '^(\\s*)!'
+        beginCaptures:
+          '0':
+            name: 'punctuation.definition.comment.jedi'
+        end: '^(?!(\\1\\s)|\\s*$)'
+        patterns: [
+          {
+            include: 'source.js'
+          }
+        ]
+      },
+      {
+        include: '#html-tag-info'
+      }
+    ]
+  'style-tag':
+    begin: '^(\\s*)(style)'
+    beginCaptures:
+      '2':
+        name: 'entity.name.tag.style.jedi'
+    end: '^(?!(\\1\\s)|\\s*$)'
+    patterns: [
+      {
+        begin: '^(\\s*)!'
+        beginCaptures:
+          '0':
+            name: 'punctuation.definition.comment.jedi'
+        end: '^(?!(\\1\\s)|\\s*$)'
+        patterns: [
+          {
+            include: 'source.css'
+          }
+        ]
+      },
+      {
+        include: '#html-tag-info'
+      }
+    ]
+  'common-tag':
+    begin: '^(\\s*)(\\b(?:mip-)?[a-zA-Z]+[1-6]?\\b)'
+    beginCaptures:
+      '2':
+        name: 'entity.name.tag.jedi'
+    end: '^(?!(\\1\\s)|\\s*$)'
+    patterns: [
+      {
+        include: '#html-tag-info'
+      },
+      {
+        include: '#main'
+      }
+    ]
+  'text-node':
+    begin: '\\s*(\'|")'
+    beginCaptures:
+      '0':
+        name: 'punctuation.definition.text.begin.jedi'
+    end: '\\1|\\n'
+    endCaptures:
+      '0':
+        name: 'punctuation.definition.text.end.jedi'
+    name: 'text.content.jedi'
+    patterns: [
+      {
+        include: '#template-expression'
+      }
+    ]
+
+  'tag-selector':
+    begin: '\\b((?:\\.[\\w\\-_]+\\b)*)(#[\\w\\-_]+\\b)?'
+    beginCaptures:
+      '1':
+        name: 'constant.language.class.jedi'
+      '2':
+        name: 'constant.language.id.jedi'
+    end: '\\s'
+  'tag-hierarchy':
+    match: '(>)\\s*(\\b(?:mip-)?[a-zA-Z]+[1-6]?\\b)'
+    captures:
+      '1':
+        name: 'punctuation.separator.combinator.jedi'
+      '2':
+        name: 'entity.name.tag.jedi'
+  'tag-attributes':
+    patterns: [
+      {
+        begin: '\\@{2}'
+        beginCaptures:
+          '0':
+            name: 'entity.other.attribute-name.start.jedi'
+        end: '$|(?=\\@)'
+        patterns: [
+          {
+            include: '#tag-attribute-multi-kv'
+          }
+        ]
+      },
+      {
+        begin: '\\@\\b'
+        beginCaptures:
+          '0':
+            name: 'entity.other.attribute-name.start.jedi'
+        end: '$|(?=\\@)'
+        patterns: [
+          {
+            include: '#tag-attribute-kv'
+          }
+        ]
+      }
+    ]
+  'tag-attribute-kv':
+    begin: '([\\w\\-_]+)\\b'
+    beginCaptures:
+      '0':
+        name: 'entity.other.attribute-name.jedi'
+    end: '$|(?=@)'
+    patterns: [
+      begin: '\\='
+      beginCaptures:
+        '0':
+          name: 'punctuation.separator.key-value.jedi'
+      end: '$|\\s'
+      patterns: [
+        {
+          include: '#tag-attribute-value'
+        }
+      ]
+    ]
+  'tag-attribute-multi-kv':
+    begin: '([\\w\\-_]+)\\b'
+    beginCaptures:
+      '0':
+        name: 'entity.other.attribute-name.jedi'
+    end: '$|\\s'
+    patterns: [
+      begin: '\\='
+      beginCaptures:
+        '0':
+          name: 'punctuation.separator.key-value.jedi'
+      end: '$|(?=\\s)'
+      contentName: 'string.quoted.attribute.jedi'
+    ]
+  'tag-attribute-value':
+    patterns: [
+      {
+        begin: '\''
+        beginCaptures:
+          '0':
+            name: 'punctuation.definition.string.begin.jedi'
+        end: '\''
+        endCaptures:
+          '0':
+            name: 'punctuation.definition.string.end.jedi'
+        name: 'string.quoted.attribute.jedi'
+      },
+      {
+        begin: '"'
+        beginCaptures:
+          '0':
+            name: 'punctuation.definition.text.begin.jedi'
+        end: '"'
+        endCaptures:
+          '0':
+            name: 'punctuation.definition.text.end.jedi'
+        name: 'string.quoted.attribute.jedi'
+        patterns: [
+          {
+            include: '#template-expression'
+          }
+        ]
+      },
+      {
+        include: '#template-expression'
+      },
+      {
+        include: '#function-call'
+      },
+      {
+        include: '#base-variable'
+      }
+    ]
+
+  'block-extended':
+    begin: '^(\\s*)(#[\\w\\-_]+)(::(before|after))?'
+    beginCaptures:
+      '2':
+        name: 'entity.name.tag.jedi'
+      '3':
+        name: 'support.class.pseudo.jedi'
+    end: '^(?!(\\1\\s)|\\s*$)'
+    patterns: [
+      {
+        include: '#main'
+      }
+    ]
+  'macro':
+    # thank atom not supporting variables in regex
+    # {{tag_name}} => \\b(?:mip-)?[a-zA-Z]+[1-6]?\\b
+    begin: '^(\\s*)::(\\b(?:mip-)?[a-zA-Z]+[1-6]?\\b((?:\\.[\\w\\-_]+\\b)*))'
+    beginCaptures:
+      '2':
+        name: 'entity.name.function.macro.jedi'
+      '2':
+        name: 'constant.language.class.macro.jedi'
+    end: '^(?!(\\1\\s)|\\s*$)'
+    patterns: [
+      {
+        begin: '\\('
+        beginCaptures:
+          '0':
+            name: 'punctuation.section.group.start.jedi'
+        end: '\\)'
+        endCaptures:
+          '0':
+            name: 'punctuation.section.group.end.jedi'
+        patterns: [
+          {
+            match: ','
+            name: 'punctuation.separator.comma.jedi'
+          },
+          {
+            match: '[_\\$a-zA-Z][_\\$a-zA-Z0-9]*'
+            name: 'variable.parameter.macro.jedi'
+          }
+        ]
+      },
+      {
+        include: '#tag-attributes'
+      },
+      ## actually not `tag-selector`, and also support Goto Symbol showing fullname
+      # {
+      #   include: '#tag-selector'
+      # },
+      {
+        include: '#main'
+      }
+    ]
+  'template-expression':
+    begin: '\\{'
+    beginCaptures:
+      '0':
+        name: 'punctuation.definition.expression.begin.jedi'
+    end: '\\}'
+    endCaptures:
+      '0':
+        name: 'punctuation.definition.expression.end.jedi'
+    patterns: [
+      {
+        include: '#expression'
+      }
+    ]
+  'assignment':
+    begin: '\\s*([\\w_]+)\\s*(=)\\s*'
+    beginCaptures:
+      '1':
+        name: 'variable.other.readwrite.jedi'
+      '2':
+        name: 'keyword.operator.value.jedi'
+    end: '$|(?=,)'
+    patterns: [
+      {
+        include: '#expression'
+      }
+    ]
+  'block-expression':
+    begin: '^\\s*\\='
+    beginCaptures:
+      '0':
+        name: 'keyword.operator.value.jedi'
+    end: '\\n'
+    patterns: [
+      {
+        include: '#expression'
+      }
+    ]
+  'inline-expression':
+    begin: '\\=\\s*\\b'
+    beginCaptures:
+      '0':
+        name: 'keyword.operator.value.jedi'
+    end: '\\n|,'
+    name: 'variable.other.readwrite.jedi'
+    patterns: [
+      {
+        include: '#expression'
+      }
+    ]
+  'macro-invoking':
+    begin: '(\\=)\\s*(\\[)'
+    beginCaptures:
+      '1':
+        name: 'keyword.operator.value.jedi'
+      '2':
+        name: 'punctuation.definition.brackets.jedi'
+    end: '\\]'
+    endCaptures:
+      '0':
+        name: 'punctuation.definition.brackets.jedi'
+    patterns: [
+      {
+        match: ','
+        name: 'punctuation.separator.comma.jedi'
+      },
+      {
+        include: '#expression'
+      }
+    ]
+  'namespace-using':
+    begin: '\\\\?\\b(?:([\\w_]+)(\\\\|/))*([\\w_]+\\b)'
+    beginCaptures:
+      '1':
+        name: 'entity.name.namespace.jedi'
+      '2':
+        name: 'punctuation.separator.namespace.jedi'
+      '3':
+        name: 'entity.name.type.class.jedi'
+    end: '$|(?=,)'
+
+  'literal':
+    patterns: [
+      {
+        match: '\\d+\.{2}(?:\\.|<)\\d+'
+        name: 'constant.language.range.jedi'
+      },
+      {
+        match: '\\d+(\\.\\d+)?'
+        name: 'constant.numeric.jedi'
+      },
+      {
+        match: '\\b(true|false)\\b'
+        name: 'constant.language.boolean.jedi'
+      },
+      {
+        match: '\\bnull\\b'
+        name: 'constant.language.null.jedi'
+      },
+      {
+        begin: '(\'|")'
+        beginCaptures:
+          '0':
+            name: 'punctuation.definition.text.begin.jedi'
+        end: '\\1'
+        name: 'string.quoted.literal.jedi'
+      }
+    ]
+  'array':
+    begin: '\\['
+    beginCaptures:
+      '0':
+        name: 'punctuation.definition.brackets.jedi'
+    end: '\\]'
+    endCaptures:
+      '0':
+        name: 'punctuation.definition.brackets.jedi'
+    patterns: [
+      {
+        match: ','
+        name: 'punctuation.separator.comma.jedi'
+      },
+      {
+        include: '#expression'
+      }
+    ]
+  'macro-data':
+    patterns: [
+      {
+        begin: '(\\*)(\\[)'
+        beginCaptures:
+          '1':
+            name: 'variable.language.macro.jedi'
+          '2':
+            name: 'punctuation.definition.brackets.jedi'
+        end: '\\]'
+        endCaptures:
+          '0':
+            name: 'punctuation.definition.brackets.jedi'
+      },
+      {
+        begin: '(\\*)(\\.)'
+        beginCaptures:
+          '1':
+            name: 'variable.language.macro.jedi'
+          '2':
+            name: 'punctuation.definition.brackets.jedi'
+        end: '\\b'
+        patterns: [
+          {
+            include: '#expression'
+          }
+        ]
+      }
+    ]
+  'property-expression':
+    begin: '(?:([A-Z][_\\$a-zA-Z0-9]*)|([_\\$a-zA-Z][_\\$a-zA-Z0-9]*))(\\.)\\b'
+    beginCaptures:
+      '1':
+        name: 'support.class.jedi'
+      '2':
+        name: 'variable.other.readwrite.jedi'
+      '3':
+        name: 'keyword.operator.property.jedi'
+    end: '\\b'
+    patterns: [
+      {
+        include: '#expression'
+      }
+    ]
+  'function-call':
+    begin: '([_\\$a-zA-Z][_\\$a-zA-Z0-9]*)(\\()'
+    beginCaptures:
+      '1':
+        name: 'support.function.call.jedi'
+      '2':
+        name: 'punctuation.section.group.start.jedi'
+    end: '\\)'
+    endCaptures:
+      '0':
+        name: 'punctuation.section.group.end.jedi'
+    patterns: [
+      {
+        match: ','
+        name: 'punctuation.separator.comma.jedi'
+      },
+      {
+        include: '#expression'
+      }
+    ]
+  'arithmetic-expression':
+    match: '\\+|\\-|×|÷|<{2,3}|>{2,3}|\\b(:?mul|div|mod)\\b'
+    name: 'keyword.operator.arithmetic.jedi'
+  'logic-expression':
+    patterns: [
+      {
+        include: '#equation-expression'
+      },
+      {
+        match: '\\|\\||&&'
+        name: 'keyword.operator.logic.jedi'
+      },
+      {
+        begin: '\\bnot\\b|!'
+        beginCaptures:
+          '0':
+            name: 'keyword.operator.logic.jedi'
+        end: '\\b'
+        patterns: [
+          {
+            include: '#expression'
+          }
+        ]
+      }
+    ]
+  'equation-expression':
+    match: '\\!\\={1,2}|\\={2,3}|>\\=?|<\\=?|<\\=>'
+    name: 'keyword.operator.logic.jedi'
+  'ternary-expression':
+    begin: '\\s*if\\b'
+    beginCaptures:
+      '0':
+        name: 'keyword.control.conditional.jedi'
+    end: '$|(?=,|\\})'
+    patterns: [
+      {
+        begin: '\\s*then\\b'
+        beginCaptures:
+          '0':
+            name: 'keyword.control.conditional.jedi'
+        end: '$|(?=,|\\})'
+        patterns: [
+          {
+            begin: '\\s*else\\b'
+            beginCaptures:
+              '0':
+                name: 'keyword.control.conditional.jedi'
+            end: '$|(?=,|\\})'
+            patterns: [
+              {
+                include: '#expression'
+              }
+            ]
+          },
+          {
+            include: '#expression'
+          }
+        ]
+      },
+      {
+        include: '#expression'
+      }
+    ]
+  'base-variable':
+    # thank atom not supporting variables in regex
+    # {{identifier}} => [_\\$a-zA-Z][_\\$a-zA-Z0-9]*
+    match: '[_\\$a-zA-Z][_\\$a-zA-Z0-9]*'
+    name: 'variable.other.readwrite.jedi'
+
+  'external-statement':
+    begin: '^(?:\\s*):\\s*(external)\\b'
+    beginCaptures:
+      '1':
+        name: 'keyword.control.external.jedi'
+    end: '\\n'
+    patterns: [
+      {
+        begin: '\\b[a-z]([\\w_]+)\\b'
+        end: '$|(?=,)'
+        name: 'support.function.php'
+      },
+      {
+        begin: '\\b[A-Z]([\\w_]+)\\b'
+        end: '$|(?=,)'
+        name: 'support.class.php'
+      },
+      {
+        match: ','
+        name: 'punctuation.separator.comma.jedi'
+      }
+    ]
+  'import-statement':
+    begin: '^(\\s*):\\s*(import)\\s*([\\w_\\-/\\.]+)?\\b'
+    beginCaptures:
+      '2':
+        name: 'keyword.control.import.jedi'
+      '3':
+        name: 'variable.parameter.import.jedi'
+    end: '^(?!(\\1\\s)|\\s*$)'
+    patterns: [
+      {
+        include: '#main'
+      }
+    ]
+  'namespace-statement':
+    begin: '^(?:\\s*):\\s*(use)\\b'
+    beginCaptures:
+      '1':
+        name: 'keyword.control.namespace.jedi'
+    end: '\\n'
+    patterns: [
+      {
+        match: ','
+        name: 'punctuation.separator.comma.jedi'
+      },
+      {
+        include: '#namespace-using'
+      }
+    ]
+  'unsafe-statement':
+    begin: '^(?:\\s*):\\s*(unsafe)\\b'
+    beginCaptures:
+      '1':
+        name: 'keyword.control.unsafe.jedi'
+    end: '\\n'
+    patterns: [
+      {
+        include: '#expression'
+      }
+    ]
+  'debug-statement':
+    begin: '^(?:\\s*):\\s*(d)\\b'
+    beginCaptures:
+      '1':
+        name: 'keyword.control.debug.jedi'
+    end: '\\n'
+    patterns: [
+      {
+        include: '#expression'
+      }
+    ]
+  'inline-statement':
+    patterns: [
+      {
+        begin: '\\bif|else\\b'
+        beginCaptures:
+          '0':
+            name: 'keyword.control.conditional.jedi'
+        end: '\\n'
+        patterns: [
+          {
+            include: '#expression'
+          }
+        ]
+      },
+      {
+        begin: '\\bfor\\b'
+        beginCaptures:
+          '0':
+            name: 'keyword.control.loop.jedi'
+        end: '\\n'
+        patterns: [
+          {
+            include: '#iterator-statement'
+          }
+        ]
+      }
+    ]
+  'if-statement':
+    begin: '^(\\s*):\\s*((?:else )?if)\\b'
+    beginCaptures:
+      '2':
+        name: 'keyword.control.conditional.jedi'
+    end: '^(?!(\\1\\s)|\\s*$)'
+    patterns: [
+      {
+        include: '#expression'
+      },
+      {
+        include: '#main'
+      }
+    ]
+  'else-statement':
+    begin: '^(\\s*):\\s*(else)\\b'
+    beginCaptures:
+      '2':
+        name: 'keyword.control.conditional.jedi'
+    end: '^(?!(\\1\\s)|\\s*$)'
+    patterns: [
+      {
+        include: '#main'
+      }
+    ]
+  'let-statement':
+    begin: '^(\\s*):\\s*(let)\\b'
+    beginCaptures:
+      '2':
+        name: 'storage.type.jedi'
+    end: '^(?!(\\1\\s)|\\s*$)'
+    patterns: [
+      {
+        begin: '\\n'
+        patterns: [
+          {
+            include: '#main'
+          }
+        ]
+      },
+      {
+        include: '#assignment'
+      }
+      {
+        match: ','
+        name: 'punctuation.separator.comma.jedi'
+      }
+    ]
+  'for-statement':
+    begin: '^(\\s*):\\s*(for)\\b'
+    beginCaptures:
+      '2':
+        name: 'keyword.control.loop.jedi'
+    end: '^(?!(\\1\\s)|\\s*$)'
+    patterns: [
+      {
+        begin: '\\n'
+        patterns: [
+          {
+            include: '#main'
+          }
+        ]
+      },
+      {
+        include: '#iterator-statement'
+      }
+    ]
+  'iterator-statement':
+    begin: '\\(?([\\s\\w_]+(?:,[\\s\\w_]+){0,3})\\)?\\s*(in)\\b'
+    beginCaptures:
+      '1':
+        name: 'variable.parameter.loop.jedi'
+      '2':
+        name: 'keyword.operator.in-loop.jedi'
+      '3':
+        name: 'variable.other.readwrite.jedi'
+    end: '$|(?=,)'
+    patterns: [
+      {
+        include: '#expression'
+      }
+    ]
+  'php-embedded':
+    begin: '^\\s*-\\s*'
+    # beginCaptures:
+    #   '0':
+    #     name: 'punctuation.section.embedded.begin.php'
+    end: '$'
+    patterns: [
+      {
+        include: 'text.html.php#language'
+      }
+    ]

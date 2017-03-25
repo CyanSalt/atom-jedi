@@ -1,0 +1,65 @@
+'.source.jedi':
+  'Haojing Template':
+    prefix: 'haojing'
+    body: """
+      :import _skeleton
+
+        #stylesheets::after
+
+        #main
+          ${1}
+
+        #defer-scripts::after
+
+    """
+  ':d (Debug)':
+    prefix: 'debug'
+    body: ':d ${1:url}'
+  ':else':
+    prefix: 'else'
+    body: ':else ${1:if }'
+  ':external':
+    prefix: 'external'
+    body: ':external ${1:isset}'
+  ':for':
+    prefix: 'for'
+    body: ':for ${1:item} in ${2:list}'
+  ':if':
+    prefix: 'if'
+    body: ':if ${1:expr}'
+  ':import':
+    prefix: 'import'
+    body: ':import ${1:_skeleton}'
+  ':let':
+    prefix: 'let'
+    body: ':let ${1:var} = ${2:value}'
+  ':use':
+    prefix: 'use'
+    body: ':use ${1:Combine}'
+  ':unsafe':
+    prefix: 'unsafe'
+    body: ':unsafe ${1:Combine.script([\'\'])}'
+  'image':
+    prefix: 'img'
+    body: 'img @src="${1://s.baixing.net/}"'
+  'stylesheet':
+    prefix: 'link'
+    body: 'link @rel="stylesheet" @href="${1://s.baixing.net/w/}"'
+  'script':
+    prefix: 'script'
+    body: """
+      script = [$2]
+        !
+          $1
+
+    """
+  'style':
+    prefix: 'style'
+    body: """
+      style
+        !
+          ${1:body} {
+            $2
+          }
+
+    """
