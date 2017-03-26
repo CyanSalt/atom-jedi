@@ -5,7 +5,22 @@
   "engines": {
     "atom": "*"
   },
-  "main": "index.js",
+  "main": "./lib/main",
+  "configSchema": {
+    "enableCMUISnippets": {
+      "title": "CMUI Snippets",
+      "description": "Enable classes snippets in CMUI (by autocomplete-plus).",
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "provide"
+      }
+    }
+  },
   "dependencies": {},
   "repository": {
     "type": "git",
