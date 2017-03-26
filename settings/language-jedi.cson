@@ -1,3 +1,5 @@
-'.source.jade':
+'.source.jedi':
   'editor':
-    'commentStart': '--'
+    commentStart: '--'
+    softWrap: false
+    tabLength: 4
