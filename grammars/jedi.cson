@@ -394,7 +394,7 @@ repository:
     beginCaptures:
       '2':
         name: 'entity.name.function.macro.jedi'
-      '2':
+      '3':
         name: 'constant.language.class.macro.jedi'
     end: '^(?!(\\1\\s)|\\s*$)'
     patterns: [
